@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Smart Expenses Tracker</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+
+<body class="auth-page">
+
+<div class="auth-layout">
+
+    <!-- LEFT: 3D GOLD SHOWCASE -->
+    <section class="auth-showcase">
+
+        <div class="brand">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="">
+            <span>Smart Expense</span>
+        </div>
+
+        <div class="scene-wrap">
+            {% include "_gold_scene.html" %}
+        </div>
+
+        <div class="showcase-copy">
+            <h2>Every rupee,<br>accounted for.</h2>
+            <p>Track your income, set monthly budgets and see exactly where your money goes.</p>
+        </div>
+
+    </section>
+
+    <!-- RIGHT: FORM -->
+    <section class="auth-panel">
+        <div class="auth-card">
+
+            <h1>Welcome back</h1>
+            <p class="auth-subtitle">Log in to your Smart Expense account.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" class="auth-btn">Log in</button>
+            </form>
+
+            <p class="auth-footer">
+                Don't have an account?
+                <a href="{{ url_for('signup') }}">Create an account</a>
+            </p>
+
+            <div class="security-text">
+                Smart Expenses Tracker<br>
+                Secure personal expense management
+            </div>
+
+        </div>
+    </section>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/fx.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smart Expense Coin</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --loop: 12s; color-scheme: dark; }
+  html, body { height: 100%; margin: 0; background: #030302; }
+  body { display: grid; place-items: center; overflow: hidden; }
+  .frame { --u: 1cqw; container-type: size; position: relative; overflow: hidden;
+    width: min(100vw, 177.78vh); aspect-ratio: 16/9;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(120,70,15,.18), transparent 60%),
+      linear-gradient(rgba(190,135,45,.04) 1px, transparent 1px) 0 0 / calc(4*var(--u)) calc(4*var(--u)),
+      linear-gradient(90deg, rgba(190,135,45,.04) 1px, transparent 1px) 0 0 / calc(4*var(--u)) calc(4*var(--u)),
+      #090807;
+    perspective: calc(100*var(--u)); }
+  .frame::after { content:""; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.85) 100%); }
+
+  .spot { position:absolute; left:50%; top:-6%; width:calc(64*var(--u)); height:80%; margin-left:calc(-32*var(--u));
+    clip-path: polygon(44% 0,56% 0,100% 100%,0 100%);
+    background: linear-gradient(rgba(255,170,60,.24), rgba(255,150,40,.04) 80%, transparent);
+    filter: blur(calc(1.2*var(--u))); animation: spot 6s ease-in-out infinite; }
+  @keyframes spot { 0%,100% { opacity:.7 } 50% { opacity:1 } }
+
+  .camera { position:absolute; inset:0; transform-style:preserve-3d; animation: push var(--loop) ease-in-out infinite; }
+  @keyframes push { 0%,100% { transform:translateZ(0) } 50% { transform:translateZ(calc(3*var(--u))) } }
+
+  .glow { position:absolute; left:50%; top:50%; width:calc(50*var(--u)); height:calc(50*var(--u));
+    margin:calc(-25*var(--u)) 0 0 calc(-25*var(--u)); border-radius:50%;
+    background: radial-gradient(circle, rgba(255,170,45,.30), rgba(255,140,20,.08) 50%, transparent 70%);
+    filter: blur(calc(1*var(--u))); animation: glow 6s ease-in-out infinite; }
+  @keyframes glow { 0%,100% { opacity:.6 } 50% { opacity:.9 } }
+
+  .dust { position:absolute; left:var(--x); top:var(--y); width:var(--s); height:var(--s); border-radius:50%; background:#ffd980;
+    box-shadow:0 0 6px 1px rgba(255,185,60,.6); animation: tw var(--t) ease-in-out infinite; }
+  @keyframes tw { 0%,100% { opacity:.1 } 50% { opacity:.6 } }
+
+  /* coin */
+  .stage { position:absolute; left:50%; top:50%; width:0; height:0; transform-style:preserve-3d; }
+  .float,.tilt,.spin { transform-style:preserve-3d; }
+  .float { animation: bob 4s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform:translateY(calc(.65*var(--u))) } 50% { transform:translateY(calc(-.65*var(--u))) } }
+  .tilt { animation: tilt var(--loop) ease-in-out infinite; }
+  @keyframes tilt { 0%,100% { transform:rotateX(-4deg) rotateZ(-1deg) } 50% { transform:rotateX(-2deg) rotateZ(1deg) } }
+
+  /* 0-4s ₹ | 4-6s turn | 6-10s Smart Expense | 10-12s turn back */
+  .spin { animation: spin var(--loop) infinite; }
+  @keyframes spin {
+    0%,33.33% { transform:rotateY(0) } 33.33% { animation-timing-function:cubic-bezier(.65,0,.35,1) }
+    50%,83.33% { transform:rotateY(180deg) } 83.33% { animation-timing-function:cubic-bezier(.65,0,.35,1) }
+    100% { transform:rotateY(360deg) } }
+
+  .coin { position:relative; width:calc(30*var(--u)); height:calc(30*var(--u)); margin:calc(-15*var(--u)); transform-style:preserve-3d; }
+  .edge { position:absolute; inset:0; border-radius:50%;
+    background: repeating-conic-gradient(#f7d263 0 1.2deg, #a8741a 1.2deg 1.9deg, #6e4507 1.9deg 2.8deg);
+    transform: translateZ(calc((var(--i) - 14.5)*.1*var(--u))); animation: rim var(--loop) ease-in-out infinite; }
+  @keyframes rim { 0%,32%,52%,82%,100% { filter:brightness(.7) } 41.67%,91.67% { filter:brightness(1.4) } }
+
+  .face { position:absolute; inset:0; border-radius:50%; overflow:hidden; backface-visibility:hidden;
+    background: radial-gradient(circle at 28% 22%, rgba(255,250,215,.55), transparent 36%), radial-gradient(circle, #f8d968 0, #e3b238 50%, #c0881a 80%, #8e5f0e 100%);
+    box-shadow: inset 0 0 0 calc(.5*var(--u)) #f9de78, inset 0 0 0 calc(.75*var(--u)) #8c5d0c, inset 0 0 calc(2*var(--u)) rgba(80,45,0,.6);
+    animation: fl var(--loop) ease-in-out infinite; }
+  .face.front { transform: translateZ(calc(1.55*var(--u))); }
+  .face.back { transform: rotateY(180deg) translateZ(calc(1.55*var(--u))); animation-delay:-6s; }
+  @keyframes fl { 0%,25%,100% { filter:brightness(1.05) } 45%,75% { filter:brightness(.72) } }
+  .face svg { position:absolute; inset:0; width:100%; height:100%; }
+
+  .ring { fill:none; stroke:#fbe08a; stroke-width:1; }
+  .dots { fill:none; stroke:#5e3a05; stroke-width:2.4; stroke-linecap:round; stroke-dasharray:.1 5.2; opacity:.75; }
+  .rup { fill:none; stroke:url(#gGold); stroke-width:9; stroke-linecap:round; stroke-linejoin:round;
+    filter: drop-shadow(0 2px 1.2px rgba(0,0,0,.75)) drop-shadow(0 -.6px 0 rgba(255,244,190,.8)); }
+
+  /* Smart Expense text */
+  .t { font-family:'Montserrat','Helvetica Neue',Arial,sans-serif; font-weight:800; fill:url(#gGold); text-anchor:middle;
+    filter: drop-shadow(0 1.5px 1px rgba(0,0,0,.8)) drop-shadow(0 -.5px 0 rgba(255,244,190,.7)); }
+  .t1 { font-size:27px; }
+  .t2 { font-size:14.5px; font-weight:600; }
+  .rule { stroke:url(#gGold); stroke-width:1.4; stroke-linecap:round; transform-box:fill-box; transform-origin:center;
+    animation: rule var(--loop) ease-out infinite; }
+  @keyframes rule { 0%,52% { transform:scaleX(0); opacity:0 } 60%,88% { transform:scaleX(1); opacity:1 } 96%,100% { transform:scaleX(0); opacity:0 } }
+
+  /* gold sheen sweeping each face while it holds */
+  .sheen { position:absolute; inset:0; border-radius:50%;
+    background: linear-gradient(115deg, transparent 38%, rgba(255,246,205,.5) 50%, transparent 62%) 100% 0 / 300% 100%;
+    animation: sw var(--loop) linear infinite; }
+  .back .sheen { animation-delay:6s; }
+  @keyframes sw { 0%,16.67% { background-position:100% 0 } 33.33% { background-position:0 0 } 33.34%,100% { background-position:100% 0 } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e5ad2c"/><stop offset="1" stop-color="#9c6a10"/></linearGradient>
+  <radialGradient id="gField"><stop offset="0" stop-color="#5a3a0a"/><stop offset=".7" stop-color="#2f1d04"/><stop offset="1" stop-color="#1c1102"/></radialGradient>
+</defs></svg>
+
+<div class="frame" aria-label="Smart Expense gold coin">
+  <div class="spot"></div>
+  <div class="camera">
+    <div class="glow"></div>
+
+    <span class="dust" style="--x:12%;--y:22%;--s:3px;--t:6s"></span>
+    <span class="dust" style="--x:86%;--y:30%;--s:2px;--t:12s"></span>
+    <span class="dust" style="--x:22%;--y:78%;--s:3px;--t:4s"></span>
+    <span class="dust" style="--x:74%;--y:14%;--s:2px;--t:6s"></span>
+    <span class="dust" style="--x:90%;--y:72%;--s:3px;--t:12s"></span>
+    <span class="dust" style="--x:8%;--y:52%;--s:2px;--t:3s"></span>
+
+    <div class="stage"><div class="float"><div class="tilt"><div class="spin"><div class="coin">
+
+      <i class="edge" style="--i:0"></i><i class="edge" style="--i:1"></i><i class="edge" style="--i:2"></i><i class="edge" style="--i:3"></i><i class="edge" style="--i:4"></i><i class="edge" style="--i:5"></i><i class="edge" style="--i:6"></i><i class="edge" style="--i:7"></i><i class="edge" style="--i:8"></i><i class="edge" style="--i:9"></i><i class="edge" style="--i:10"></i><i class="edge" style="--i:11"></i><i class="edge" style="--i:12"></i><i class="edge" style="--i:13"></i><i class="edge" style="--i:14"></i><i class="edge" style="--i:15"></i><i class="edge" style="--i:16"></i><i class="edge" style="--i:17"></i><i class="edge" style="--i:18"></i><i class="edge" style="--i:19"></i><i class="edge" style="--i:20"></i><i class="edge" style="--i:21"></i><i class="edge" style="--i:22"></i><i class="edge" style="--i:23"></i><i class="edge" style="--i:24"></i><i class="edge" style="--i:25"></i><i class="edge" style="--i:26"></i><i class="edge" style="--i:27"></i><i class="edge" style="--i:28"></i><i class="edge" style="--i:29"></i>
+
+      <!-- FRONT: Indian rupee -->
+      <div class="face front"><svg viewBox="0 0 200 200">
+        <circle class="ring" cx="100" cy="100" r="92"/>
+        <circle class="dots" cx="100" cy="100" r="85"/>
+        <circle class="ring" cx="100" cy="100" r="76"/>
+        <circle cx="100" cy="100" r="75" fill="url(#gField)"/>
+        <g transform="translate(100 100) scale(.95) translate(-50 -50)"><path class="rup" d="M24 20H76M24 38H76M30 20H46A16 16 0 0 1 46 52H30L64 88"/></g>
+      </svg><i class="sheen"></i></div>
+
+      <!-- BACK: Smart Expense -->
+      <div class="face back"><svg viewBox="0 0 200 200">
+        <circle class="ring" cx="100" cy="100" r="92"/>
+        <circle class="dots" cx="100" cy="100" r="85"/>
+        <circle class="ring" cx="100" cy="100" r="76"/>
+        <circle cx="100" cy="100" r="75" fill="url(#gField)"/>
+        <text class="t t1" x="100" y="97" textLength="116" lengthAdjust="spacing">SMART</text>
+        <line class="rule" x1="62" y1="107" x2="138" y2="107"/>
+        <text class="t t2" x="100" y="128" textLength="104" lengthAdjust="spacing">EXPENSE</text>
+      </svg><i class="sheen"></i></div>
+
+    </div></div></div></div></div>
+  </div>
+</div>
+</body>
+</html>
